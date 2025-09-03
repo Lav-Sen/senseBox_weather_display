@@ -59,7 +59,7 @@ const uint16_t bitmap_snow[] = {0x0, 0x0, 0x0, 0x0, 0xcfff, 0x0, 0xcfff, 0x0, 0x
 0x0, 0x0, 0x0, 0x0, 0xcfff, 0x0, 0xcfff, 0x0, 0x0, 0x0, 0x0, 0x0,
 };
 
-void printOnDisplay(String title, String measurement, String unit) {
+void printOnDisplay(String title, String measurement, String unit, String title2, String measurement2, String unit2) {
 
   display.setCursor(0, 0);
   display.setTextSize(1);
@@ -71,6 +71,19 @@ void printOnDisplay(String title, String measurement, String unit) {
   display.print(" ");
   display.setTextSize(1);
   display.println(unit);
+
+  display.setCursor(0, 30);
+  display.setTextSize(1);
+  display.setTextColor(WHITE, BLACK);
+  display.println(title2);
+  display.setCursor(0, 40);
+  display.setTextSize(2);
+  display.print(measurement2);
+  display.print(" ");
+  display.setTextSize(1);
+  display.println(unit2);
+  display.display();
+
 }
 
 
@@ -101,33 +114,30 @@ void setup() {
 }
 
 void loop() {
+  
     delay(5000);
     matrix_2.fillScreen(0);
     matrix_2.show();
-     display.clearDisplay();
 
-  sensors_event_t temp_event, pressure_event;
-  dps.getEvents(&temp_event, &pressure_event);
+   sensors_event_t temp_event, pressure_event;
+   dps.getEvents(&temp_event, &pressure_event);
+
+    printOnDisplay("Temperatur", String(temp_event.temperature), "Grad", "Luftdruck", String(pressure_event.pressure), "hpa");
+
+    Serial.print(String(temp_event.temperature));  
 
   if ((temp_event.temperature > 20 || pressure_event.pressure > 1020)) {
      matrix_2.drawRGBBitmap(0,0, bitmap_sonny, WIDTH, HEIGHT);
      matrix_2.show();
-      printOnDisplay("Temperatur", String(temp_event.temperature), "Grad");
-  
   } else if((temp_event.temperature < 20 || pressure_event.pressure < 1020)){
      matrix_2.drawRGBBitmap(0,0, bitmap_cloudAndSunny, WIDTH, HEIGHT);
      matrix_2.show(); matrix_2.show();
-       printOnDisplay("Temperatur", String(temp_event.temperature), "Grad");
-
   }  else if((temp_event.temperature < 15 || pressure_event.pressure < 1000)) {
      matrix_2.drawRGBBitmap(0,0, bitmap_cloud, WIDTH, HEIGHT);
      matrix_2.show();
-    printOnDisplay("Temperatur", String(temp_event.temperature), "Grad");
-      
   } else if(temp_event.temperature < 5) {
     matrix_2.drawRGBBitmap(0,0, bitmap_snow, WIDTH, HEIGHT);
     matrix_2.show();
-    printOnDisplay("Temperatur", String(temp_event.temperature), "Grad");
-      
   } 
+
 }
